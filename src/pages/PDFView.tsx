@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, Suspense } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useParams, useNavigate, Link } from 'react-router-dom';
 import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
@@ -21,15 +21,6 @@ import { getSecurePdfUrl, openPdfInNewTab } from '@/utils/pdf-security';
 const pdfOptions = configurePdfJs();
 console.log('PDF.js configured, version:', pdfjs.version);
 
-// Add this at the top of the file for TypeScript global declaration
-// @ts-ignore
-// eslint-disable-next-line
-declare global {
-  interface Window {
-    adsbygoogle?: any[];
-  }
-}
-
 // Add function to detect mobile devices
 const isMobileDevice = () => {
   return (
@@ -38,71 +29,6 @@ const isMobileDevice = () => {
       /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
         navigator.userAgent
       ))
-  );
-};
-
-// AdBox component
-const AdBox = ({ onFinish }: { onFinish: () => void }) => {
-  const [seconds, setSeconds] = useState(5);
-  const adContainerRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    if (seconds === 0) {
-      onFinish();
-      return;
-    }
-    const timer = setTimeout(() => setSeconds(s => s - 1), 1000);
-    return () => clearTimeout(timer);
-  }, [seconds, onFinish]);
-
-  useEffect(() => {
-    // Remove any previous ad content
-    if (adContainerRef.current) {
-      adContainerRef.current.innerHTML = '';
-      // Create the ins element
-      const ins = document.createElement('ins');
-      ins.className = 'adsbygoogle';
-      ins.style.display = 'block';
-      ins.style.width = '100%';
-      ins.style.minHeight = '90px';
-      ins.setAttribute('data-ad-client', 'ca-pub-9023292263085500');
-      ins.setAttribute('data-ad-slot', '2387965934');
-      ins.setAttribute('data-ad-format', 'auto');
-      ins.setAttribute('data-full-width-responsive', 'true');
-      adContainerRef.current.appendChild(ins);
-
-      // @ts-ignore
-      if (window.adsbygoogle) {
-        try {
-          // @ts-ignore
-          window.adsbygoogle.push({});
-        } catch (e) {
-          // ignore
-        }
-      }
-    }
-  }, []);
-
-  return (
-    <div className="flex flex-col items-center justify-center w-full h-full p-8">
-      <div className="mb-3 text-xs uppercase tracking-widest text-primary font-semibold">Sponsored</div>
-      <div className="mb-4 w-full flex items-center justify-center">
-        {/* Google AdSense ad slot */}
-        <div ref={adContainerRef} style={{ width: '100%' }} />
-      </div>
-      <div className="mb-2 text-center text-base font-medium">Unlocking your PDF...</div>
-      <div className="mb-1 text-center text-sm text-muted-foreground">
-        Your document will be ready in {seconds} second{seconds !== 1 ? 's' : ''}.
-      </div>
-      <div className="w-full mt-4">
-        <div className="h-2 rounded bg-primary/10 overflow-hidden">
-          <div
-            className="h-2 bg-primary transition-all"
-            style={{ width: `${((5 - seconds) / 5) * 100}%` }}
-          />
-        </div>
-      </div>
-    </div>
   );
 };
 
@@ -134,7 +60,6 @@ const PDFView = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [showDirectDownloadPrompt, setShowDirectDownloadPrompt] = useState(false);
   const [showMobileOptions, setShowMobileOptions] = useState(false);
-  const [showAd, setShowAd] = useState(true);
 
   // Detect mobile on component mount and window resize
   useEffect(() => {
@@ -677,12 +602,6 @@ const PDFView = () => {
     );
   };
 
-  useEffect(() => {
-    setShowAd(true);
-  }, [id]); // Show ad again when PDF changes
-
-  const handleAdFinish = () => setShowAd(false);
-
   if (isNoteLoading) {
     return (
       <div className="min-h-screen bg-background">
@@ -716,7 +635,6 @@ const PDFView = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      {/* No overlay, just inline ad */}
       {renderMobileOptions()}
       <main className={`container mx-auto px-4 ${isFullscreen ? 'pt-0' : 'pt-24'} pb-16`}>
         <div className="mb-6 flex items-center gap-4">
@@ -730,7 +648,7 @@ const PDFView = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* PDF Viewer - Takes up 2/3 of the space on large screens */}
           <div className="lg:col-span-2">
-            <Card className={`border border-white/10 bg-black/40 backdrop-blur-sm ${isFullscreen ? 'h-screen' : ''}`}> 
+            <Card className={`border border-white/10 bg-black/40 backdrop-blur-sm ${isFullscreen ? 'h-screen' : ''}`}>
               <CardHeader className="p-4 border-b border-white/10 flex-row justify-between items-center">
                 <CardTitle className="text-lg font-medium flex items-center">
                   {note?.title || 'Document Viewer'}
@@ -756,11 +674,8 @@ const PDFView = () => {
                     </div>
                   </div>
                 )}
-                {showAd ? (
-                  <AdBox onFinish={handleAdFinish} />
-                ) : (
-                  renderPDF()
-                )}
+                
+                {renderPDF()}
               </CardContent>
               
               <CardFooter className="p-4 border-t border-white/10 flex justify-between flex-wrap gap-4">

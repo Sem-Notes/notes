@@ -14,6 +14,8 @@ import { toast } from 'sonner';
 import { useAuth } from '@/auth/AuthContext';
 // Import our PDF worker configuration
 import { configurePdfJs } from '@/utils/pdfjs-worker';
+// Import our new PDF security utilities
+import { getSecurePdfUrl, openPdfInNewTab } from '@/utils/pdf-security';
 
 // Setup PDF.js worker once at the module level
 const pdfOptions = configurePdfJs();
@@ -123,74 +125,33 @@ const PDFView = () => {
       // On mobile devices, always default to iframe for better compatibility
       if (isMobile) {
         console.log('Mobile device detected, using iframe viewer');
-        setPdfUrl(url);
-        setUseIframeViewer(true);
-        setIsDownloading(false);
-        return true;
-      }
-      
-      // Extract the path from the URL to use with Supabase API
-      let path = '';
-      try {
-        const urlObj = new URL(url);
-        console.log('URL pathname:', urlObj.pathname);
         
-        // Try to extract the path after "notes/"
-        const matches = urlObj.pathname.match(/\/object\/public\/notes\/(.+)/i) || 
-                       urlObj.pathname.match(/\/notes\/(.+)/i);
+        // Get a secure URL for the PDF
+        const { url: secureUrl, success } = await getSecurePdfUrl(url, true);
         
-        if (matches && matches[1]) {
-          path = decodeURIComponent(matches[1]);
-          console.log('Extracted path:', path);
+        if (success && secureUrl) {
+          setPdfUrl(secureUrl);
+          setUseIframeViewer(true);
+          setIsDownloading(false);
+          return true;
         } else {
-          throw new Error('Could not parse file path from URL');
-        }
-      } catch (pathError) {
-        console.error('Error parsing URL:', pathError);
-        // Continue anyway, we'll try direct fetch as fallback
-      }
-      
-      // First attempt - Try using a signed URL (best for CORS)
-      if (path) {
-        try {
-          console.log('Attempt 1: Creating a signed URL');
-          
-          const { data: signedURL, error: signError } = await supabase.storage
-            .from('notes')
-            .createSignedUrl(path, 300); // 5 minute expiry
-            
-          if (!signError && signedURL?.signedUrl) {
-            console.log('Using signed URL:', signedURL.signedUrl);
-            const signedResponse = await fetch(signedURL.signedUrl, {
-              headers: {
-                'Cache-Control': 'no-cache',
-                'Pragma': 'no-cache',
-              },
-            });
-            
-            if (signedResponse.ok) {
-              const signedBlob = await signedResponse.blob();
-              handleBlobSuccess(signedBlob);
-              setIsDownloading(false);
-              return true;
-            } else {
-              console.error('Signed URL fetch failed:', signedResponse.status);
-            }
-          } else {
-            console.error('Signed URL creation failed:', signError);
-          }
-        } catch (signedError) {
-          console.error('Signed URL approach failed:', signedError);
-          // Continue to next approach
+          throw new Error('Failed to get secure URL for mobile');
         }
       }
       
-      // Second attempt - Try direct fetch without credentials
+      // Get a secure URL for the desktop viewer
+      const { url: secureUrl, success, error } = await getSecurePdfUrl(url, false);
+      
+      if (!success || !secureUrl) {
+        console.error('Failed to get secure URL:', error);
+        throw new Error(error || 'Failed to get secure URL');
+      }
+      
+      // Try direct fetch with secure URL
       try {
-        console.log('Attempt 2: Direct fetch without credentials');
-        const response = await fetch(url, {
+        console.log('Fetching with secure URL:', secureUrl);
+        const response = await fetch(secureUrl, {
           method: 'GET',
-          // No credentials: 'include' to avoid CORS issues
           headers: {
             'Cache-Control': 'no-cache',
             'Pragma': 'no-cache',
@@ -198,57 +159,28 @@ const PDFView = () => {
         });
         
         if (response.ok) {
-          console.log('Direct fetch successful');
+          console.log('Secure fetch successful');
           const blob = await response.blob();
           handleBlobSuccess(blob);
           setIsDownloading(false);
           return true;
         } else {
-          console.log('Direct fetch failed with status:', response.status);
+          console.log('Secure fetch failed with status:', response.status);
         }
       } catch (directError) {
-        console.log('Direct fetch error:', directError);
+        console.log('Secure fetch error:', directError);
       }
       
-      // Third attempt - Try Supabase download API if we have a path
-      if (path) {
-        try {
-          console.log('Attempt 3: Using Supabase storage download API');
-          
-          const { data, error } = await supabase.storage
-            .from('notes')
-            .download(path);
-            
-          if (error) {
-            console.error('Supabase download error:', error);
-            throw error;
-          }
-          
-          if (!data) {
-            throw new Error('No data received from Supabase');
-          }
-          
-          console.log('Supabase download successful!');
-          handleBlobSuccess(data);
-          setIsDownloading(false);
-          return true;
-        } catch (supabaseError) {
-          console.error('Supabase download approach failed:', supabaseError);
-        }
-      }
-      
-      // If all attempts failed, show iframe as fallback
-      console.log('All direct download attempts failed, falling back to iframe');
-      setPdfUrl(url);
+      // If direct fetch failed, fall back to iframe with secure URL
+      console.log('Falling back to iframe with secure URL');
+      setPdfUrl(secureUrl);
       setUseIframeViewer(true);
       setIsDownloading(false);
       return false;
       
     } catch (error) {
-      console.error("Failed to fetch PDF after all attempts:", error);
+      console.error("Failed to fetch PDF:", error);
       setPdfError(`Failed to fetch PDF: ${error.message}`);
-      setPdfUrl(url); // Still set the URL for iframe fallback
-      setUseIframeViewer(true);
       setIsDownloading(false);
       return false;
     }
@@ -465,63 +397,11 @@ const PDFView = () => {
       return;
     }
     
-    // Track if we're attempting to handle the file
-    let handled = false;
+    // Try to open PDF in new tab
+    const opened = await openPdfInNewTab(note.file_url, false);
     
-    try {
-      // First check if the URL is valid by making a HEAD request
-      const checkResponse = await fetch(note.file_url, {
-        method: 'HEAD',
-        cache: 'no-cache'
-      }).catch(() => null); // Catch network errors
-      
-      if (checkResponse && checkResponse.ok) {
-        // URL is valid, open it directly
-        window.open(note.file_url, '_blank');
-        toast.success('Opening PDF in a new tab');
-        handled = true;
-      } else {
-        console.log('URL check failed, status:', checkResponse?.status);
-        // Try to get a fresh signed URL
-        await tryGetSignedUrl();
-      }
-    } catch (error) {
-      console.error('Error checking URL:', error);
-      await tryGetSignedUrl();
-    }
-    
-    // Function to try getting a signed URL
-    async function tryGetSignedUrl() {
-      try {
-        // Try to extract the path
-        const urlParts = note.file_url.split('/notes/');
-        if (urlParts.length > 1) {
-          const path = urlParts[1];
-          console.log('Getting signed URL for path:', path);
-          
-          const { data: signedURL, error } = await supabase.storage
-            .from('notes')
-            .createSignedUrl(path, 300); // 5 minutes
-          
-          if (error) {
-            console.error('Failed to create signed URL:', error);
-            throw error;
-          }
-          
-          if (signedURL && signedURL.signedUrl) {
-            window.open(signedURL.signedUrl, '_blank');
-            toast.success('Opening PDF with secure link');
-            handled = true;
-          }
-        }
-      } catch (signedError) {
-        console.error('Failed to get signed URL:', signedError);
-      }
-    }
-    
-    // If we couldn't handle the file, show error
-    if (!handled) {
-      toast.error('Could not open PDF in browser. Please use our app viewer.');
+    if (!opened) {
+      toast.error('External viewing is disabled by administrators');
       setShowDirectDownloadPrompt(true);
     }
   };
@@ -535,7 +415,7 @@ const PDFView = () => {
     }
   }, [isMobile, note, id]);
   
-  // Handle viewing in system viewer (for mobile)
+  // Modified viewInSystemViewer to use secure PDF utilities
   const viewInSystemViewer = async () => {
     if (!note?.file_url) {
       toast.error('File URL not available');
@@ -543,25 +423,13 @@ const PDFView = () => {
     }
     
     try {
-      // Try to use a signed URL for better compatibility
-      const urlParts = note.file_url.split('/notes/');
-      if (urlParts.length > 1) {
-        const path = urlParts[1];
-        
-        const { data: signedURL, error } = await supabase.storage
-          .from('notes')
-          .createSignedUrl(path, 3600); // 1 hour expiry for better viewing experience
-        
-        if (!error && signedURL?.signedUrl) {
-          window.open(signedURL.signedUrl, '_blank');
-          toast.success('Opening in your system viewer');
-          return;
-        }
-      }
+      const opened = await openPdfInNewTab(note.file_url, true);
       
-      // Fallback to direct URL
-      window.open(note.file_url, '_blank');
-      toast.success('Opening in your system viewer');
+      if (opened) {
+        toast.success('Opening in your system viewer');
+      } else {
+        toast.error('Could not open in system viewer. Please try the in-app viewer.');
+      }
     } catch (error) {
       console.error('Error opening in system viewer:', error);
       toast.error('Could not open in system viewer');
@@ -654,27 +522,28 @@ const PDFView = () => {
     if (isMobile) {
       // For mobile, provide PDF directly in iframe with controls disabled
       if (note?.file_url) {
-        // Create URL with disabled controls for iframe
-        const enhancedUrl = note.file_url.includes('?') 
-          ? `${note.file_url}#toolbar=0&navpanes=0&scrollbar=0` 
-          : `${note.file_url}#toolbar=0&navpanes=0&scrollbar=0`;
-          
         return (
           <div className="w-full h-full relative">
-            <iframe 
-              ref={iframeRef}
-              src={enhancedUrl}
-              className="w-full h-full border-0"
-              title={note?.title || "PDF Document"}
-              onLoad={() => {
-                setLoading(false);
-                console.log("Mobile iframe loaded successfully");
-              }}
-              onError={(e) => {
-                console.error("Mobile iframe error:", e);
-                setPdfError("Failed to load PDF in viewer");
-              }}
-            />
+            {pdfUrl ? (
+              <iframe 
+                ref={iframeRef}
+                src={pdfUrl} // Already has security parameters from getSecurePdfUrl
+                className="w-full h-full border-0"
+                title={note?.title || "PDF Document"}
+                onLoad={() => {
+                  setLoading(false);
+                  console.log("Mobile iframe loaded successfully");
+                }}
+                onError={(e) => {
+                  console.error("Mobile iframe error:", e);
+                  setPdfError("Failed to load PDF in viewer");
+                }}
+              />
+            ) : (
+              <div className="flex items-center justify-center h-full">
+                <div className="animate-spin w-10 h-10 border-4 border-primary border-t-transparent rounded-full"></div>
+              </div>
+            )}
             
             {/* Floating button to show options again */}
             <Button 
@@ -706,15 +575,11 @@ const PDFView = () => {
     }
     
     if (pdfUrl) {
-      // Regular iframe for desktop with PDF viewer controls disabled
-      const enhancedUrl = pdfUrl.includes('?') 
-        ? `${pdfUrl}#toolbar=0&navpanes=0&scrollbar=0` 
-        : `${pdfUrl}#toolbar=0&navpanes=0&scrollbar=0`;
-        
+      // Regular iframe for desktop (URL already has security parameters from getSecurePdfUrl)
       return (
         <iframe 
           ref={iframeRef}
-          src={enhancedUrl}
+          src={pdfUrl}
           className="w-full h-full border-0"
           title={note?.title || "PDF Document"}
           onLoad={() => {

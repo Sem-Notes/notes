@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SemNotes - Your Study Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
+    <script>
+      // Prevent page reloads when switching tabs
+      (function() {
+        // Generate a unique session ID
+        if (!sessionStorage.getItem('app_session_id')) {
+          sessionStorage.setItem('app_session_id', Date.now().toString());
+        }
+        
+        // Track tab visibility
+        let hidden, visibilityChange;
+        if (typeof document.hidden !== "undefined") {
+          hidden = "hidden";
+          visibilityChange = "visibilitychange";
+        } else if (typeof document.msHidden !== "undefined") {
+          hidden = "msHidden";
+          visibilityChange = "msvisibilitychange";
+        } else if (typeof document.webkitHidden !== "undefined") {
+          hidden = "webkitHidden";
+          visibilityChange = "webkitvisibilitychange";
+        }
+        
+        // This approach catches and prevents hard reload when tab regains focus
+        let lastVisitTime = Date.now();
+        
+        document.addEventListener(visibilityChange, function() {
+          if (document[hidden]) {
+            // Page is hidden, store current time
+            sessionStorage.setItem('last_hidden_time', Date.now().toString());
+          } else {
+            // Page is visible again
+            const lastHiddenTime = parseInt(sessionStorage.getItem('last_hidden_time') || '0');
+            const timeDiff = Date.now() - lastHiddenTime;
+            
+            // Only prevent reload if the time difference is reasonable (less than 30 minutes)
+            if (timeDiff < 30 * 60 * 1000) {
+              // Update the last visit time
+              lastVisitTime = Date.now();
+              sessionStorage.setItem('last_visit_time', lastVisitTime.toString());
+              // Log for debugging
+              console.log("Tab visibility changed: visible, preventing reload");
+            }
+          }
+        }, false);
+        
+        // Set a flag when the page is unloading
+        window.addEventListener('beforeunload', function() {
+          sessionStorage.setItem('clean_unload', 'true');
+        });
+        
+        // Track initial page load
+        window.addEventListener('load', function() {
+          // Check if this is a clean load or a reload after tab switching
+          const cleanUnload = sessionStorage.getItem('clean_unload') === 'true';
+          
+          if (cleanUnload) {
+            // This was a proper navigation, clear the flag
+            sessionStorage.removeItem('clean_unload');
+          }
+          
+          // Update last visit time
+          sessionStorage.setItem('last_visit_time', Date.now().toString());
+        });
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import Navbar from '@/components/Navbar';
@@ -12,6 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import AdminNotesList from '@/components/admin/AdminNotesList';
 import AdminUsersList from '@/components/admin/AdminUsersList';
 import AdminDashboard from '@/components/admin/AdminDashboard';
+import AdminMultiUpload from '@/components/admin/AdminMultiUpload';
 
 const Admin = () => {
   const { user } = useAuth();
@@ -91,6 +91,8 @@ const Admin = () => {
           
           <TabsContent value="subjects">
             <div className="grid grid-cols-1 gap-6">
+              <AdminMultiUpload />
+              
               <Card className="border border-white/10 bg-black/40 backdrop-blur-sm">
                 <CardHeader>
                   <CardTitle className="flex justify-between items-center">

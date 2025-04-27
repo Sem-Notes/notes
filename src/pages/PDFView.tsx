@@ -636,21 +636,20 @@ const PDFView = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       {renderMobileOptions()}
-      <main className={`container mx-auto px-4 ${isFullscreen ? 'pt-0' : 'pt-24'} pb-16`}>
-        <div className="mb-6 flex items-center gap-4">
-          <Button variant="ghost" onClick={() => navigate(-1)} size="sm">
+      <main className={`container mx-auto px-2 sm:px-4 ${isFullscreen ? 'pt-0' : 'pt-20 sm:pt-24'} pb-8 sm:pb-16`}>
+        <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
+          <Button variant="ghost" onClick={() => navigate(-1)} size="sm" className="w-full sm:w-auto">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
           </Button>
         </div>
-
-        {/* New side-by-side layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* PDF Viewer - Takes up 2/3 of the space on large screens */}
-          <div className="lg:col-span-2">
-            <Card className={`border border-white/10 bg-black/40 backdrop-blur-sm ${isFullscreen ? 'h-screen' : ''}`}>
-              <CardHeader className="p-4 border-b border-white/10 flex-row justify-between items-center">
-                <CardTitle className="text-lg font-medium flex items-center">
+        {/* Responsive grid: stack on mobile, side-by-side on desktop */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+          {/* PDF Viewer - Full width on mobile, 2/3 on desktop */}
+          <div className="col-span-1 lg:col-span-2">
+            <Card className={`border border-white/10 bg-black/40 backdrop-blur-sm ${isFullscreen ? 'h-screen' : ''}`}> 
+              <CardHeader className="p-3 sm:p-4 border-b border-white/10 flex-row justify-between items-center">
+                <CardTitle className="text-base sm:text-lg font-medium flex items-center">
                   {note?.title || 'Document Viewer'}
                 </CardTitle>
                 <div className="flex gap-2 items-center">
@@ -664,8 +663,7 @@ const PDFView = () => {
                   </Button>
                 </div>
               </CardHeader>
-              
-              <CardContent className={`p-0 ${isFullscreen ? 'h-[calc(100vh-120px)]' : 'h-[70vh]'} overflow-auto flex items-center justify-center bg-black/30`}>
+              <CardContent className={`p-0 ${isFullscreen ? 'h-[calc(100vh-120px)]' : 'h-[60vh] sm:h-[70vh]'} overflow-auto flex items-center justify-center bg-black/30`}>
                 {isDownloading && (
                   <div className="absolute inset-0 flex items-center justify-center z-10 bg-black/50">
                     <div className="flex flex-col items-center">
@@ -674,40 +672,36 @@ const PDFView = () => {
                     </div>
                   </div>
                 )}
-                
                 {renderPDF()}
               </CardContent>
-              
-              <CardFooter className="p-4 border-t border-white/10 flex justify-between flex-wrap gap-4">
-                <div className="w-full flex justify-center gap-4">
-                  {isDownloading ? (
-                    <Button variant="default" disabled>
-                      <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2"></div>
-                      Preparing PDF...
-                    </Button>
-                  ) : (
-                    <Button 
-                      variant="outline" 
-                      onClick={() => fetchPdfAsBlob(note?.file_url)}
-                      disabled={!note?.file_url || isDownloading}
-                    >
-                      <RefreshCw className="h-4 w-4 mr-2" /> Try Again
-                    </Button>
-                  )}
-                </div>
+              <CardFooter className="p-3 sm:p-4 border-t border-white/10 flex flex-wrap gap-2 sm:gap-4 justify-center">
+                {isDownloading ? (
+                  <Button variant="default" disabled className="w-full sm:w-auto">
+                    <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2"></div>
+                    Preparing PDF...
+                  </Button>
+                ) : (
+                  <Button 
+                    variant="outline" 
+                    onClick={() => fetchPdfAsBlob(note?.file_url)}
+                    disabled={!note?.file_url || isDownloading}
+                    className="w-full sm:w-auto"
+                  >
+                    <RefreshCw className="h-4 w-4 mr-2" /> Try Again
+                  </Button>
+                )}
               </CardFooter>
             </Card>
           </div>
-          
-          {/* Details Section - Takes up 1/3 of the space on large screens */}
-          <div className="lg:col-span-1">
+          {/* Details/Related Section - Full width below on mobile, 1/3 on desktop */}
+          <div className="col-span-1">
             {note && (
-              <Card className="h-full border border-white/10 bg-black/40 backdrop-blur-sm">
+              <Card className="h-full border border-white/10 bg-black/40 backdrop-blur-sm mt-4 lg:mt-0">
                 <CardHeader>
-                  <CardTitle className="text-lg font-medium">Note Details</CardTitle>
-                  <CardDescription>Information about this document</CardDescription>
+                  <CardTitle className="text-base sm:text-lg font-medium">Note Details</CardTitle>
+                  <CardDescription className="text-xs sm:text-sm">Information about this document</CardDescription>
                 </CardHeader>
-                <CardContent className="grid gap-6">
+                <CardContent className="grid gap-4 sm:gap-6">
                   <div className="grid gap-4">
                     <div className="flex items-start gap-2">
                       <Book className="h-5 w-5 mt-0.5 text-muted-foreground" />

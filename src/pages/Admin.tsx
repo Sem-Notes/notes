@@ -12,6 +12,7 @@ import AdminNotesList from '@/components/admin/AdminNotesList';
 import AdminUsersList from '@/components/admin/AdminUsersList';
 import AdminDashboard from '@/components/admin/AdminDashboard';
 import AdminMultiUpload from '@/components/admin/AdminMultiUpload';
+import { Helmet } from "react-helmet-async";
 
 const Admin = () => {
   const { user } = useAuth();
@@ -52,70 +53,76 @@ const Admin = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <Navbar />
-      
-      <main className="container mx-auto px-4 pt-24 pb-16">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gradient mb-2">Admin Dashboard</h1>
-          <p className="text-muted-foreground">Manage users, review notes, and view analytics</p>
-        </div>
+    <>
+      <Helmet>
+        <title>Admin Dashboard | SemNotes</title>
+        <meta name="description" content="Manage users, review notes, and view analytics as an admin on SemNotes." />
+      </Helmet>
+      <div className="min-h-screen bg-background text-foreground">
+        <Navbar />
         
-        <Tabs defaultValue="dashboard">
-          <TabsList className="w-full bg-secondary/10 border border-secondary/30 mb-8">
-            <TabsTrigger value="dashboard" className="flex-1 data-[state=active]:bg-primary/30">
-              <BarChart2 className="h-4 w-4 mr-2" /> Dashboard
-            </TabsTrigger>
-            <TabsTrigger value="notes" className="flex-1 data-[state=active]:bg-primary/30">
-              <BookOpen className="h-4 w-4 mr-2" /> Notes Approval
-            </TabsTrigger>
-            <TabsTrigger value="users" className="flex-1 data-[state=active]:bg-primary/30">
-              <UserCircle className="h-4 w-4 mr-2" /> Users
-            </TabsTrigger>
-            <TabsTrigger value="subjects" className="flex-1 data-[state=active]:bg-primary/30">
-              <Layers className="h-4 w-4 mr-2" /> Subjects
-            </TabsTrigger>
-          </TabsList>
+        <main className="container mx-auto px-4 pt-24 pb-16">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-gradient mb-2">Admin Dashboard</h1>
+            <p className="text-muted-foreground">Manage users, review notes, and view analytics</p>
+          </div>
           
-          <TabsContent value="dashboard">
-            <AdminDashboard />
-          </TabsContent>
-          
-          <TabsContent value="notes">
-            <AdminNotesList />
-          </TabsContent>
-          
-          <TabsContent value="users">
-            <AdminUsersList />
-          </TabsContent>
-          
-          <TabsContent value="subjects">
-            <div className="grid grid-cols-1 gap-6">
-              <AdminMultiUpload />
-              
-              <Card className="border border-white/10 bg-black/40 backdrop-blur-sm">
-                <CardHeader>
-                  <CardTitle className="flex justify-between items-center">
-                    <span>Manage Subjects</span>
-                    <Button size="sm">
-                      <Book className="h-4 w-4 mr-2" /> Add Subject
-                    </Button>
-                  </CardTitle>
-                  <CardDescription>
-                    Add, edit, or remove subjects from the platform
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-center py-8 text-muted-foreground">
-                    Subject management functionality coming soon
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-        </Tabs>
-      </main>
-    </div>
+          <Tabs defaultValue="dashboard">
+            <TabsList className="w-full bg-secondary/10 border border-secondary/30 mb-8">
+              <TabsTrigger value="dashboard" className="flex-1 data-[state=active]:bg-primary/30">
+                <BarChart2 className="h-4 w-4 mr-2" /> Dashboard
+              </TabsTrigger>
+              <TabsTrigger value="notes" className="flex-1 data-[state=active]:bg-primary/30">
+                <BookOpen className="h-4 w-4 mr-2" /> Notes Approval
+              </TabsTrigger>
+              <TabsTrigger value="users" className="flex-1 data-[state=active]:bg-primary/30">
+                <UserCircle className="h-4 w-4 mr-2" /> Users
+              </TabsTrigger>
+              <TabsTrigger value="subjects" className="flex-1 data-[state=active]:bg-primary/30">
+                <Layers className="h-4 w-4 mr-2" /> Subjects
+              </TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="dashboard">
+              <AdminDashboard />
+            </TabsContent>
+            
+            <TabsContent value="notes">
+              <AdminNotesList />
+            </TabsContent>
+            
+            <TabsContent value="users">
+              <AdminUsersList />
+            </TabsContent>
+            
+            <TabsContent value="subjects">
+              <div className="grid grid-cols-1 gap-6">
+                <AdminMultiUpload />
+                
+                <Card className="border border-white/10 bg-black/40 backdrop-blur-sm">
+                  <CardHeader>
+                    <CardTitle className="flex justify-between items-center">
+                      <span>Manage Subjects</span>
+                      <Button size="sm">
+                        <Book className="h-4 w-4 mr-2" /> Add Subject
+                      </Button>
+                    </CardTitle>
+                    <CardDescription>
+                      Add, edit, or remove subjects from the platform
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-center py-8 text-muted-foreground">
+                      Subject management functionality coming soon
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+          </Tabs>
+        </main>
+      </div>
+    </>
   );
 };
 

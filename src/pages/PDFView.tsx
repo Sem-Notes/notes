@@ -16,6 +16,7 @@ import { useAuth } from '@/auth/AuthContext';
 import { configurePdfJs } from '@/utils/pdfjs-worker';
 // Import our new PDF security utilities
 import { getSecurePdfUrl, openPdfInNewTab } from '@/utils/pdf-security';
+import { Helmet } from "react-helmet-async";
 
 // Setup PDF.js worker once at the module level
 const pdfOptions = configurePdfJs();
@@ -633,136 +634,142 @@ const PDFView = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      {renderMobileOptions()}
-      <main className={`container mx-auto px-2 sm:px-4 ${isFullscreen ? 'pt-0' : 'pt-20 sm:pt-24'} pb-8 sm:pb-16`}>
-        <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
-          <Button variant="ghost" onClick={() => navigate(-1)} size="sm" className="w-full sm:w-auto">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back
-          </Button>
-        </div>
-        {/* Responsive grid: stack on mobile, side-by-side on desktop */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-          {/* PDF Viewer - Full width on mobile, 2/3 on desktop */}
-          <div className="col-span-1 lg:col-span-2">
-            <Card className={`border border-white/10 bg-black/40 backdrop-blur-sm ${isFullscreen ? 'h-screen' : ''}`}> 
-              <CardHeader className="p-3 sm:p-4 border-b border-white/10 flex-row justify-between items-center">
-                <CardTitle className="text-base sm:text-lg font-medium flex items-center">
-                  {note?.title || 'Document Viewer'}
-                </CardTitle>
-                <div className="flex gap-2 items-center">
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    onClick={toggleFullscreen}
-                    title="Toggle fullscreen"
-                  >
-                    {isFullscreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent className={`p-0 ${isFullscreen ? 'h-[calc(100vh-120px)]' : 'h-[60vh] sm:h-[70vh]'} overflow-auto flex items-center justify-center bg-black/30`}>
-                {isDownloading && (
-                  <div className="absolute inset-0 flex items-center justify-center z-10 bg-black/50">
-                    <div className="flex flex-col items-center">
-                      <div className="animate-spin w-10 h-10 border-4 border-primary border-t-transparent rounded-full mb-4"></div>
-                      <p className="text-sm text-muted-foreground">Loading PDF...</p>
-                    </div>
-                  </div>
-                )}
-                {renderPDF()}
-              </CardContent>
-              <CardFooter className="p-3 sm:p-4 border-t border-white/10 flex flex-wrap gap-2 sm:gap-4 justify-center">
-                {isDownloading ? (
-                  <Button variant="default" disabled className="w-full sm:w-auto">
-                    <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2"></div>
-                    Preparing PDF...
-                  </Button>
-                ) : (
-                  <Button 
-                    variant="outline" 
-                    onClick={() => fetchPdfAsBlob(note?.file_url)}
-                    disabled={!note?.file_url || isDownloading}
-                    className="w-full sm:w-auto"
-                  >
-                    <RefreshCw className="h-4 w-4 mr-2" /> Try Again
-                  </Button>
-                )}
-              </CardFooter>
-            </Card>
+    <>
+      <Helmet>
+        <title>PDF Viewer | SemNotes</title>
+        <meta name="description" content="View PDF notes securely and efficiently on SemNotes." />
+      </Helmet>
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        {renderMobileOptions()}
+        <main className={`container mx-auto px-2 sm:px-4 ${isFullscreen ? 'pt-0' : 'pt-20 sm:pt-24'} pb-8 sm:pb-16`}>
+          <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
+            <Button variant="ghost" onClick={() => navigate(-1)} size="sm" className="w-full sm:w-auto">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back
+            </Button>
           </div>
-          {/* Details/Related Section - Full width below on mobile, 1/3 on desktop */}
-          <div className="col-span-1">
-            {note && (
-              <Card className="h-full border border-white/10 bg-black/40 backdrop-blur-sm mt-4 lg:mt-0">
-                <CardHeader>
-                  <CardTitle className="text-base sm:text-lg font-medium">Note Details</CardTitle>
-                  <CardDescription className="text-xs sm:text-sm">Information about this document</CardDescription>
+          {/* Responsive grid: stack on mobile, side-by-side on desktop */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+            {/* PDF Viewer - Full width on mobile, 2/3 on desktop */}
+            <div className="col-span-1 lg:col-span-2">
+              <Card className={`border border-white/10 bg-black/40 backdrop-blur-sm ${isFullscreen ? 'h-screen' : ''}`}> 
+                <CardHeader className="p-3 sm:p-4 border-b border-white/10 flex-row justify-between items-center">
+                  <CardTitle className="text-base sm:text-lg font-medium flex items-center">
+                    {note?.title || 'Document Viewer'}
+                  </CardTitle>
+                  <div className="flex gap-2 items-center">
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      onClick={toggleFullscreen}
+                      title="Toggle fullscreen"
+                    >
+                      {isFullscreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
+                    </Button>
+                  </div>
                 </CardHeader>
-                <CardContent className="grid gap-4 sm:gap-6">
-                  <div className="grid gap-4">
-                    <div className="flex items-start gap-2">
-                      <Book className="h-5 w-5 mt-0.5 text-muted-foreground" />
-                      <div>
-                        <h4 className="font-medium">Subject</h4>
-                        <p className="text-sm text-muted-foreground">{note.subject?.name || 'Not specified'}</p>
+                <CardContent className={`p-0 ${isFullscreen ? 'h-[calc(100vh-120px)]' : 'h-[60vh] sm:h-[70vh]'} overflow-auto flex items-center justify-center bg-black/30`}>
+                  {isDownloading && (
+                    <div className="absolute inset-0 flex items-center justify-center z-10 bg-black/50">
+                      <div className="flex flex-col items-center">
+                        <div className="animate-spin w-10 h-10 border-4 border-primary border-t-transparent rounded-full mb-4"></div>
+                        <p className="text-sm text-muted-foreground">Loading PDF...</p>
                       </div>
                     </div>
-                    <div className="flex items-start gap-2">
-                      <User className="h-5 w-5 mt-0.5 text-muted-foreground" />
-                      <div>
-                        <h4 className="font-medium">Added By</h4>
-                        <p className="text-sm text-muted-foreground">{note.student?.full_name || 'Unknown'}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <Calendar className="h-5 w-5 mt-0.5 text-muted-foreground" />
-                      <div>
-                        <h4 className="font-medium">Date Added</h4>
-                        <p className="text-sm text-muted-foreground">
-                          {note.created_at 
-                            ? new Date(note.created_at).toLocaleDateString() 
-                            : 'Unknown'
-                          }
-                        </p>
-                      </div>
-                    </div>
-                    {note.unit_number && (
+                  )}
+                  {renderPDF()}
+                </CardContent>
+                <CardFooter className="p-3 sm:p-4 border-t border-white/10 flex flex-wrap gap-2 sm:gap-4 justify-center">
+                  {isDownloading ? (
+                    <Button variant="default" disabled className="w-full sm:w-auto">
+                      <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2"></div>
+                      Preparing PDF...
+                    </Button>
+                  ) : (
+                    <Button 
+                      variant="outline" 
+                      onClick={() => fetchPdfAsBlob(note?.file_url)}
+                      disabled={!note?.file_url || isDownloading}
+                      className="w-full sm:w-auto"
+                    >
+                      <RefreshCw className="h-4 w-4 mr-2" /> Try Again
+                    </Button>
+                  )}
+                </CardFooter>
+              </Card>
+            </div>
+            {/* Details/Related Section - Full width below on mobile, 1/3 on desktop */}
+            <div className="col-span-1">
+              {note && (
+                <Card className="h-full border border-white/10 bg-black/40 backdrop-blur-sm mt-4 lg:mt-0">
+                  <CardHeader>
+                    <CardTitle className="text-base sm:text-lg font-medium">Note Details</CardTitle>
+                    <CardDescription className="text-xs sm:text-sm">Information about this document</CardDescription>
+                  </CardHeader>
+                  <CardContent className="grid gap-4 sm:gap-6">
+                    <div className="grid gap-4">
                       <div className="flex items-start gap-2">
                         <Book className="h-5 w-5 mt-0.5 text-muted-foreground" />
                         <div>
-                          <h4 className="font-medium">Unit</h4>
-                          <p className="text-sm text-muted-foreground">Unit {note.unit_number}</p>
+                          <h4 className="font-medium">Subject</h4>
+                          <p className="text-sm text-muted-foreground">{note.subject?.name || 'Not specified'}</p>
                         </div>
                       </div>
+                      <div className="flex items-start gap-2">
+                        <User className="h-5 w-5 mt-0.5 text-muted-foreground" />
+                        <div>
+                          <h4 className="font-medium">Added By</h4>
+                          <p className="text-sm text-muted-foreground">{note.student?.full_name || 'Unknown'}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <Calendar className="h-5 w-5 mt-0.5 text-muted-foreground" />
+                        <div>
+                          <h4 className="font-medium">Date Added</h4>
+                          <p className="text-sm text-muted-foreground">
+                            {note.created_at 
+                              ? new Date(note.created_at).toLocaleDateString() 
+                              : 'Unknown'
+                            }
+                          </p>
+                        </div>
+                      </div>
+                      {note.unit_number && (
+                        <div className="flex items-start gap-2">
+                          <Book className="h-5 w-5 mt-0.5 text-muted-foreground" />
+                          <div>
+                            <h4 className="font-medium">Unit</h4>
+                            <p className="text-sm text-muted-foreground">Unit {note.unit_number}</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {note.description && (
+                      <div>
+                        <h4 className="font-medium mb-2">Description</h4>
+                        <p className="text-sm text-muted-foreground">{note.description}</p>
+                      </div>
                     )}
-                  </div>
-                  
-                  {note.description && (
-                    <div>
-                      <h4 className="font-medium mb-2">Description</h4>
-                      <p className="text-sm text-muted-foreground">{note.description}</p>
+                    
+                    {/* Information about in-app viewing */}
+                    <div className="mt-auto pt-4 border-t border-white/10">
+                      <h4 className="font-medium mb-3">Note</h4>
+                      <div className="bg-primary/10 p-3 rounded-md border border-primary/20">
+                        <p className="text-sm text-muted-foreground">
+                          This document is available for viewing exclusively within our app. We hope you enjoy the content and find it useful for your studies.
+                        </p>
+                      </div>
                     </div>
-                  )}
-                  
-                  {/* Information about in-app viewing */}
-                  <div className="mt-auto pt-4 border-t border-white/10">
-                    <h4 className="font-medium mb-3">Note</h4>
-                    <div className="bg-primary/10 p-3 rounded-md border border-primary/20">
-                      <p className="text-sm text-muted-foreground">
-                        This document is available for viewing exclusively within our app. We hope you enjoy the content and find it useful for your studies.
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+                  </CardContent>
+                </Card>
+              )}
+            </div>
           </div>
-        </div>
-      </main>
-    </div>
+        </main>
+      </div>
+    </>
   );
 };
 

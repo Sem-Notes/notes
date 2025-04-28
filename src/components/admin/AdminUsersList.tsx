@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -31,17 +30,28 @@ const AdminUsersList = () => {
 
   const toggleAdminStatus = async (id: string, currentStatus: boolean) => {
     try {
-      const { error } = await supabase
-        .from('students')
-        .update({ is_admin: !currentStatus })
-        .eq('id', id);
+      console.log(`Attempting to toggle admin status for user ${id} from ${currentStatus} to ${!currentStatus}`);
       
-      if (error) throw error;
+      const { data, error } = await supabase
+        .rpc('toggle_admin_status', { target_user_id: id });
       
+      if (error) {
+        console.error('Error updating admin status:', error);
+        throw error;
+      }
+      
+      if (!data) {
+        throw new Error('Failed to update admin status');
+      }
+      
+      console.log('Successfully updated admin status');
       toast.success(`User ${currentStatus ? 'removed from' : 'added to'} admin role`);
-      refetch();
+      
+      // Force a refetch of the users list
+      await refetch();
     } catch (error: any) {
-      toast.error(`Error updating user: ${error.message}`);
+      console.error('Error in toggleAdminStatus:', error);
+      toast.error(`Error updating user: ${error.message || 'Unknown error occurred'}`);
     }
   };
 

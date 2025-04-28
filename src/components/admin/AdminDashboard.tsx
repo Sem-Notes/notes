@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -112,8 +111,41 @@ const AdminDashboard = () => {
     }
   });
 
-  // Chart colors
-  const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042'];
+  // Query for students by academic year
+  const { data: usersByYear, isLoading: usersByYearLoading } = useQuery({
+    queryKey: ['usersByYear'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('students')
+        .select('academic_year');
+      if (error) throw error;
+      const yearCounts = { 'Year 1': 0, 'Year 2': 0, 'Year 3': 0, 'Year 4': 0, 'Unknown': 0 };
+      data.forEach(user => {
+        const year = user.academic_year ? `Year ${user.academic_year}` : 'Unknown';
+        yearCounts[year] = (yearCounts[year] || 0) + 1;
+      });
+      return Object.entries(yearCounts).map(([name, value]) => ({ name, value }));
+    }
+  });
+
+  // Chart colors: dark-theme-optimized, bold and readable
+  const COLORS = [
+    "#6366f1", // Indigo
+    "#f59e42", // Orange
+    "#10b981", // Emerald
+    "#f43f5e", // Rose
+    "#fbbf24", // Amber
+    "#3b82f6", // Blue
+    "#a21caf", // Fuchsia
+    "#f472b6", // Pink
+    "#22d3ee", // Cyan
+    "#84cc16", // Lime
+    "#eab308", // Gold
+    "#0ea5e9", // Sky Blue
+    "#a3e635", // Neon Green
+    "#f87171", // Red
+    "#c026d3", // Purple
+  ];
 
   return (
     <div className="space-y-6">
@@ -185,68 +217,64 @@ const AdminDashboard = () => {
       </div>
       
       {/* Charts */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="border border-white/10 bg-black/40 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle>Notes by Branch</CardTitle>
-            <CardDescription>Distribution of notes by department</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {branchLoading ? (
-              <div className="h-64 flex items-center justify-center">
-                <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full"></div>
-              </div>
-            ) : (
-              <div className="h-64">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={branchData}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                      outerRadius={80}
-                      fill="#8884d8"
-                      dataKey="value"
-                    >
-                      {branchData?.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-        
-        <Card className="border border-white/10 bg-black/40 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle>Notes by Academic Year</CardTitle>
-            <CardDescription>Distribution of notes by year</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {yearLoading ? (
-              <div className="h-64 flex items-center justify-center">
-                <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full"></div>
-              </div>
-            ) : (
-              <div className="h-64">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={yearData}>
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Bar dataKey="value" fill="#8884d8" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+      <Card className="border border-white/10 bg-black/40 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle>Notes by Branch & Students by Academic Year</CardTitle>
+          <CardDescription>
+            Distribution of notes by department and students by year
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col md:flex-row gap-6 h-64">
+            {/* Notes by Branch Pie Chart */}
+            <div className="flex-1 flex items-center justify-center">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={branchData}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                    outerRadius={80}
+                    fill="#8884d8"
+                    dataKey="value"
+                  >
+                    {branchData?.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+            {/* Students by Academic Year Pie Chart */}
+            <div className="flex-1 flex items-center justify-center">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={usersByYear}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={({ name, percent, value }) =>
+                      value > 0 ? `${name}: ${(percent * 100).toFixed(0)}%` : ''
+                    }
+                    outerRadius={80}
+                    fill="#8884d8"
+                    dataKey="value"
+                  >
+                    {usersByYear?.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

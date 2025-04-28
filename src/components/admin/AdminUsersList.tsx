@@ -22,11 +22,14 @@ const AdminUsersList = () => {
     }
   });
 
-  const filteredUsers = users?.filter(user => 
-    user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.branch?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredUsers = users?.filter(user => {
+    const term = searchTerm.toLowerCase();
+    return (
+      user.full_name?.toLowerCase().includes(term) ||
+      user.email?.toLowerCase().includes(term) ||
+      user.branch?.toLowerCase().includes(term)
+    );
+  });
 
   const toggleAdminStatus = async (id: string, currentStatus: boolean) => {
     try {

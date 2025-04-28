@@ -31,7 +31,7 @@ const queryClient = new QueryClient({
   },
 });
 
-console.log("[APP] Initializing application with QueryClient");
+// console.log("[APP] Initializing application with QueryClient");
 
 // ErrorBoundary for Suspense and lazy imports
 interface ErrorBoundaryProps {

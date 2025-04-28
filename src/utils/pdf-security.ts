@@ -25,10 +25,8 @@ export const extractPathFromUrl = (url: string): string | null => {
       }
     }
     
-    console.error('Could not extract path from URL:', url);
     return null;
   } catch (error) {
-    console.error('Error extracting path from URL:', error);
     return null;
   }
 };
@@ -58,8 +56,6 @@ export const getSecurePdfUrl = async (
       .createSignedUrl(path, expiry);
 
     if (error) {
-      console.error('Error creating signed URL:', error);
-      
       // Fall back to direct URL if allowed by config
       if (PDF_DIRECT_ACCESS) {
         return { url: fileUrl, success: true };
@@ -87,7 +83,6 @@ export const getSecurePdfUrl = async (
 
     return { url: enhancedUrl, success: true };
   } catch (error) {
-    console.error('Error getting secure PDF URL:', error);
     return { 
       url: '', 
       success: false, 
@@ -106,14 +101,12 @@ export const openPdfInNewTab = async (
   try {
     // Only proceed if downloads are allowed or it's a mobile device
     if (!PDF_ALLOW_DOWNLOADS && !isMobile) {
-      console.warn('Direct PDF access is disabled');
       return false;
     }
 
     const { url, success, error } = await getSecurePdfUrl(fileUrl, isMobile);
     
     if (!success || !url) {
-      console.error('Failed to get secure URL for new tab:', error);
       return false;
     }
     
@@ -121,7 +114,6 @@ export const openPdfInNewTab = async (
     window.open(url, '_blank');
     return true;
   } catch (error) {
-    console.error('Error opening PDF in new tab:', error);
     return false;
   }
 }; 

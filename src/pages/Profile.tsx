@@ -18,13 +18,13 @@ const Profile = () => {
   const queryClient = useQueryClient();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   
-  console.log("[PROFILE] Profile page rendered, user:", user?.id);
+  // console.log("[PROFILE] Profile page rendered, user:", user?.id);
 
   // Fetch user profile
   const { data: profile, isLoading } = useQuery({
     queryKey: ['userProfile', user?.id],
     queryFn: async () => {
-      console.log("[PROFILE] Fetching user profile for:", user?.id);
+      // console.log("[PROFILE] Fetching user profile for:", user?.id);
       const { data, error } = await supabase
         .from('students')
         .select('*')
@@ -35,7 +35,7 @@ const Profile = () => {
         console.error("[PROFILE] Error fetching profile:", error);
         throw error;
       }
-      console.log("[PROFILE] Profile data:", data);
+      // console.log("[PROFILE] Profile data:", data);
       return data;
     },
     enabled: !!user,
@@ -44,14 +44,14 @@ const Profile = () => {
   });
 
   useEffect(() => {
-    console.log("[PROFILE] Profile data from query:", profile);
+    // console.log("[PROFILE] Profile data from query:", profile);
   }, [profile]);
 
   // Fetch user's uploads
   const { data: uploads } = useQuery({
     queryKey: ['userUploads', user?.id],
     queryFn: async () => {
-      console.log("[PROFILE] Fetching user uploads for:", user?.id);
+      // console.log("[PROFILE] Fetching user uploads for:", user?.id);
       const { data, error } = await supabase
         .from('notes')
         .select(`

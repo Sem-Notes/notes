@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { BookOpen, Home, Upload as UploadIcon, User, Menu, X, LogOut } from 'lucide-react';
@@ -48,9 +47,6 @@ const Navbar = () => {
     }`}>
       <div className="container mx-auto px-4 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
-          <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
-            <span className="text-white font-bold text-xl">S</span>
-          </div>
           <span className="font-bold text-xl text-white">SemNotes</span>
         </Link>
         

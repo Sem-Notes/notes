@@ -20,7 +20,7 @@ import { Helmet } from "react-helmet-async";
 
 // Setup PDF.js worker once at the module level
 const pdfOptions = configurePdfJs();
-console.log('PDF.js configured, version:', pdfjs.version);
+// console.log('PDF.js configured, version:', pdfjs.version);
 
 // Add function to detect mobile devices
 const isMobileDevice = () => {
@@ -121,11 +121,11 @@ const PDFView = () => {
     try {
       setIsDownloading(true);
       setPdfError(null);
-      console.log('Attempting to fetch PDF from:', url);
+      // console.log('Attempting to fetch PDF from:', url);
       
       // On mobile devices, always default to iframe for better compatibility
       if (isMobile) {
-        console.log('Mobile device detected, using iframe viewer');
+        // console.log('Mobile device detected, using iframe viewer');
         
         // Get a secure URL for the PDF
         const { url: secureUrl, success } = await getSecurePdfUrl(url, true);
@@ -150,7 +150,7 @@ const PDFView = () => {
       
       // Try direct fetch with secure URL
       try {
-        console.log('Fetching with secure URL:', secureUrl);
+        // console.log('Fetching with secure URL:', secureUrl);
         const response = await fetch(secureUrl, {
           method: 'GET',
           headers: {
@@ -160,20 +160,20 @@ const PDFView = () => {
         });
         
         if (response.ok) {
-          console.log('Secure fetch successful');
+          // console.log('Secure fetch successful');
           const blob = await response.blob();
           handleBlobSuccess(blob);
           setIsDownloading(false);
           return true;
         } else {
-          console.log('Secure fetch failed with status:', response.status);
+          // console.log('Secure fetch failed with status:', response.status);
         }
       } catch (directError) {
-        console.log('Secure fetch error:', directError);
+        // console.log('Secure fetch error:', directError);
       }
       
       // If direct fetch failed, fall back to iframe with secure URL
-      console.log('Falling back to iframe with secure URL');
+      // console.log('Falling back to iframe with secure URL');
       setPdfUrl(secureUrl);
       setUseIframeViewer(true);
       setIsDownloading(false);
@@ -533,7 +533,7 @@ const PDFView = () => {
                 title={note?.title || "PDF Document"}
                 onLoad={() => {
                   setLoading(false);
-                  console.log("Mobile iframe loaded successfully");
+                  // console.log("Mobile iframe loaded successfully");
                 }}
                 onError={(e) => {
                   console.error("Mobile iframe error:", e);
@@ -585,10 +585,10 @@ const PDFView = () => {
           title={note?.title || "PDF Document"}
           onLoad={() => {
             setLoading(false);
-            console.log("Iframe loaded successfully");
+            // console.log("Iframe loaded successfully");
           }}
           onError={(e) => {
-            console.error("Iframe error:", e);
+            // console.error("Iframe error:", e);
             setPdfError("Failed to load PDF in viewer");
             setLoading(false);
           }}

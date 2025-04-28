@@ -28,7 +28,7 @@ const HeroSection = () => {
         <div className="w-full md:w-1/2 text-center md:text-left md:pl-16">
           <motion.h1 
             ref={titleRef} 
-            className="text-5xl md:text-5xl lg:text-5xl font-bold mb-6 tracking-tight flex items-center justify-center md:justify-start gap-3 whitespace-nowrap overflow-hidden"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-bold mb-6 tracking-tight flex items-center justify-center md:justify-start gap-3 whitespace-nowrap overflow-hidden"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}

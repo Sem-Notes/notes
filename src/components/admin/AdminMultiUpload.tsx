@@ -94,7 +94,7 @@ const AdminMultiUpload = () => {
     if (!files || files.length === 0) return;
     
     const selectedFile = files[0];
-    console.log(`File selected for Unit ${unitIndex + 1}:`, selectedFile.name);
+    // console.log(`File selected for Unit ${unitIndex + 1}:`, selectedFile.name);
     
     // Validate file type
     if (selectedFile.type !== 'application/pdf') {
@@ -204,7 +204,7 @@ const AdminMultiUpload = () => {
       const cleanFileName = unitFile.file.name.replace(/\s+/g, '_');
       const fileName = `${folderPath}/admin_${user.id}_unit${unitFile.unit_number}_${Date.now()}_${cleanFileName}`;
       
-      console.log(`Uploading to storage path: ${fileName}`);
+      // console.log(`Uploading to storage path: ${fileName}`);
       
       // Upload file to storage
       const { data: uploadData, error: uploadError } = await supabase.storage
@@ -219,7 +219,7 @@ const AdminMultiUpload = () => {
         throw uploadError;
       }
       
-      console.log("File uploaded to storage successfully");
+      // console.log("File uploaded to storage successfully");
       
       // Update progress
       setUnitFiles(prev => {
@@ -239,7 +239,7 @@ const AdminMultiUpload = () => {
       }
       
       const fileUrl = publicUrlData.publicUrl;
-      console.log("Public URL generated:", fileUrl);
+      // console.log("Public URL generated:", fileUrl);
       
       // Update progress
       setUnitFiles(prev => {
@@ -260,7 +260,7 @@ const AdminMultiUpload = () => {
         downloads: 0
       };
       
-      console.log("Inserting note record:", noteData);
+      // console.log("Inserting note record:", noteData);
       
       // Insert note into database
       const { error: insertError } = await supabase
@@ -272,7 +272,7 @@ const AdminMultiUpload = () => {
         throw insertError;
       }
       
-      console.log("Note record created successfully");
+      // console.log("Note record created successfully");
       
       // Update status to success
       setUnitFiles(prev => {
@@ -344,7 +344,7 @@ const AdminMultiUpload = () => {
 
   // Handle form submission
   const onSubmit = async (data: MultiUploadFormData) => {
-    console.log("Form submitted with data:", data);
+    // console.log("Form submitted with data:", data);
     
     // Check if subject is selected
     if (!data.subject_id) {
@@ -367,18 +367,18 @@ const AdminMultiUpload = () => {
       let successCount = 0;
       let totalToUpload = unitFiles.filter(unit => unit.file !== null).length;
       
-      console.log(`Starting upload of ${totalToUpload} files for subject ID: ${data.subject_id}`);
+      // console.log(`Starting upload of ${totalToUpload} files for subject ID: ${data.subject_id}`);
       
       // Upload files in sequence
       for (let i = 0; i < unitFiles.length; i++) {
         if (unitFiles[i].file) {
-          console.log(`Processing Unit ${i+1} file: ${unitFiles[i].file.name}`);
+          // console.log(`Processing Unit ${i+1} file: ${unitFiles[i].file.name}`);
           const success = await uploadSingleFile(unitFiles[i], data.subject_id, i);
           if (success) {
             successCount++;
-            console.log(`Unit ${i+1} uploaded successfully`);
+            // console.log(`Unit ${i+1} uploaded successfully`);
           } else {
-            console.error(`Unit ${i+1} upload failed`);
+            // console.error(`Unit ${i+1} upload failed`);
           }
           
           // Update overall progress
@@ -386,7 +386,7 @@ const AdminMultiUpload = () => {
         }
       }
       
-      console.log(`Upload complete. ${successCount} of ${totalToUpload} files uploaded successfully.`);
+      // console.log(`Upload complete. ${successCount} of ${totalToUpload} files uploaded successfully.`);
       
       // Show success message
       if (successCount > 0) {

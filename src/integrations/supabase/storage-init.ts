@@ -10,7 +10,7 @@ export async function ensureNotesBucket() {
       .list('', { limit: 1 });
     
     if (!error) {
-      console.log("[STORAGE] Notes bucket is accessible");
+      // console.log("[STORAGE] Notes bucket is accessible");
       return true;
     }
     
@@ -31,7 +31,7 @@ export async function initStorage() {
   const bucketAccessible = await ensureNotesBucket();
   
   if (!bucketAccessible) {
-    console.log("[STORAGE] Notes bucket may need to be created by an admin in the Supabase dashboard");
-    console.log("[STORAGE] Create a bucket named 'notes' with public access and 20MB file limit");
+    // console.log("[STORAGE] Notes bucket may need to be created by an admin in the Supabase dashboard");
+    // console.log("[STORAGE] Create a bucket named 'notes' with public access and 20MB file limit");
   }
 } 

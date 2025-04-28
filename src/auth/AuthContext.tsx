@@ -23,7 +23,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log("[AUTH] Setting up auth context and session handling");
+    // console.log("[AUTH] Setting up auth context and session handling");
     
     // Flag to track if session restoration is in progress
     let isRestoringSession = false;
@@ -44,7 +44,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     
     if (isProtectedPath) {
       sessionStorage.setItem('lastPath', currentPath);
-      console.log("[AUTH] Stored current path for possible restoration:", currentPath);
+      // console.log("[AUTH] Stored current path for possible restoration:", currentPath);
     }
 
     // Explicit flag to prevent reload when switching tabs
@@ -53,14 +53,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // Helper function to handle visibility changes
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
-        console.log("[AUTH] Tab became visible again, checking session...");
+        // console.log("[AUTH] Tab became visible again, checking session...");
         
         // Flag to prevent navigation on auth state refresh
         justBecameVisible = true;
         
         // Calculate time since last activity
         const timeInactive = Date.now() - lastActiveTime;
-        console.log("[AUTH] Time inactive:", timeInactive, "ms");
+        // console.log("[AUTH] Time inactive:", timeInactive, "ms");
         
         // Update activity timestamp
         lastActiveTime = Date.now();
@@ -74,7 +74,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           // Just verify the session is still valid without triggering a full reload
           supabase.auth.getSession().then(({ data }) => {
             if (data.session) {
-              console.log("[AUTH] Session still valid after tab switch");
+              // console.log("[AUTH] Session still valid after tab switch");
               
               // Refresh user data to ensure everything is current
               if (data.session.user && !isRestoringSession) {
@@ -89,13 +89,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setTimeout(() => {
           justBecameVisible = false;
           window.sessionStorage.removeItem('skip_navigation');
-          console.log("[AUTH] Navigation prevention cleared");
+          // console.log("[AUTH] Navigation prevention cleared");
         }, 3000);
       } else {
         // Tab is hidden, update last active time
         lastActiveTime = Date.now();
         window.sessionStorage.setItem('last_active_time', lastActiveTime.toString());
-        console.log("[AUTH] Tab hidden, storing timestamp");
+        // console.log("[AUTH] Tab hidden, storing timestamp");
       }
     };
 
@@ -105,7 +105,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // Set up auth state listener first
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, newSession) => {
-        console.log("[AUTH] Auth state changed:", event, newSession?.user?.id);
+        // console.log("[AUTH] Auth state changed:", event, newSession?.user?.id);
         
         // Check if we should skip navigation after tab switch
         const skipNavigation = justBecameVisible || 
@@ -114,7 +114,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         if (newSession) {
           setSession(newSession);
           setUser(newSession.user);
-          console.log("[AUTH] Session updated:", newSession.user?.id);
+          // console.log("[AUTH] Session updated:", newSession.user?.id);
           
           // Use setTimeout to prevent auth deadlocks
           if (newSession.user && (event === 'SIGNED_IN') && !skipNavigation) {
@@ -130,32 +130,32 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                   .eq('id', newSession.user.id)
                   .single();
 
-                console.log("[AUTH] User profile data:", profile, error);
+                // console.log("[AUTH] User profile data:", profile, error);
                   
                 // If profile doesn't exist or is missing required fields, redirect to onboarding
                 if (!profile || !profile.branch || !profile.academic_year || !profile.semester) {
-                  console.log("[AUTH] User needs onboarding, redirecting...");
+                  // console.log("[AUTH] User needs onboarding, redirecting...");
                   navigate('/onboarding');
                 } else if (event === 'SIGNED_IN' && !skipNavigation) {
-                  console.log("[AUTH] User has completed onboarding, redirecting to home...");
+                  // console.log("[AUTH] User has completed onboarding, redirecting to home...");
                   navigate('/home');
                   toast.success('Successfully signed in!');
                 } else {
-                  console.log("[AUTH] Skipping navigation after tab switch");
+                  // console.log("[AUTH] Skipping navigation after tab switch");
                 }
               } catch (error) {
-                console.error("[AUTH] Error checking user profile:", error);
+                // console.error("[AUTH] Error checking user profile:", error);
                 // If there's an error or no profile found, direct to onboarding
                 navigate('/onboarding');
               }
             }, 0);
           } else if (skipNavigation) {
-            console.log("[AUTH] Skipping navigation after tab focus change");
+            // console.log("[AUTH] Skipping navigation after tab focus change");
           }
         } else {
           setSession(null);
           setUser(null);
-          console.log("[AUTH] Session cleared");
+          // console.log("[AUTH] Session cleared");
           
           if (event === 'SIGNED_OUT') {
             navigate('/');
@@ -169,14 +169,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const checkExistingSession = async () => {
       isRestoringSession = true;
       try {
-        console.log("[AUTH] Checking for existing session...");
+        // console.log("[AUTH] Checking for existing session...");
         const { data: { session: existingSession } } = await supabase.auth.getSession();
-        console.log("[AUTH] Existing session check result:", !!existingSession, existingSession?.user?.id);
+        // console.log("[AUTH] Existing session check result:", !!existingSession, existingSession?.user?.id);
         
         if (existingSession) {
           setSession(existingSession);
           setUser(existingSession.user);
-          console.log("[AUTH] Existing session restored:", existingSession.user?.id);
+          // console.log("[AUTH] Existing session restored:", existingSession.user?.id);
           
           // Check if user has a profile
           const { data: profile, error } = await supabase
@@ -185,13 +185,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             .eq('id', existingSession.user.id)
             .single();
             
-          console.log("[AUTH] Existing user profile check:", profile);
+          // console.log("[AUTH] Existing user profile check:", profile);
           
           if (!profile || !profile.branch || !profile.academic_year || !profile.semester) {
             navigate('/onboarding');
           } else if (isPDFViewPath || isNotePath || isSubjectPath) {
             // Stay on the current page for specific content views
-            console.log("[AUTH] Staying on current content view page");
+            // console.log("[AUTH] Staying on current content view page");
           } else {
             // Check for stored path after reload
             const lastPath = sessionStorage.getItem('lastPath');
@@ -205,14 +205,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 lastPath.startsWith('/home');
                 
               if (shouldRestore) {
-                console.log("[AUTH] Restoring previous path:", lastPath);
+                // console.log("[AUTH] Restoring previous path:", lastPath);
                 navigate(lastPath);
               }
             }
           }
         }
       } catch (error) {
-        console.error("[AUTH] Error checking existing session:", error);
+        // console.error("[AUTH] Error checking existing session:", error);
       } finally {
         setLoading(false);
         isRestoringSession = false;
@@ -234,7 +234,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }, 10 * 60 * 1000); // 10 minutes
 
     return () => {
-      console.log("[AUTH] Cleaning up auth subscription");
+      // console.log("[AUTH] Cleaning up auth subscription");
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       subscription.unsubscribe();
       clearInterval(heartbeatInterval);

@@ -16,7 +16,7 @@ const AdminNotesList = () => {
   const { data: pendingNotes, isLoading, refetch } = useQuery({
     queryKey: ['pendingNotes'],
     queryFn: async () => {
-      console.log("Fetching pending notes");
+      // console.log("Fetching pending notes"); 
       const { data, error } = await supabase
         .from('notes')
         .select(`
@@ -28,12 +28,12 @@ const AdminNotesList = () => {
         .order('created_at', { ascending: false });
       
       if (error) {
-        console.error("Error fetching pending notes:", error);
+        // console.error("Error fetching pending notes:", error);
         throw error;
       }
       
       const filteredData = data?.filter(note => !locallyApprovedIds.includes(note.id)) || [];
-      console.log(`Fetched ${data?.length} pending notes, filtered to ${filteredData.length} after removing locally approved`);
+      //  console.log(`Fetched ${data?.length} pending notes, filtered to ${filteredData.length} after removing locally approved`);
       
       return filteredData as NoteWithSubject[];
     },
@@ -44,7 +44,7 @@ const AdminNotesList = () => {
   const handleApprove = async (id: string) => {
     try {
       setProcessingIds(prev => [...prev, id]);
-      console.log("Approving note:", id);
+      // console.log("Approving note:", id);
       
       // Step 1: Verify the note exists and isn't already approved
       const { data: checkData, error: checkError } = await supabase
@@ -58,10 +58,10 @@ const AdminNotesList = () => {
         throw checkError;
       }
       
-      console.log("Note before update:", checkData);
+      // console.log("Note before update:", checkData);
       
       if (checkData?.is_approved) {
-        console.log("Note is already approved, skipping update");
+        // console.log("Note is already approved, skipping update");
         setLocallyApprovedIds(prev => [...prev, id]);
         const updatedNotes = pendingNotes?.filter(note => note.id !== id) || [];
         queryClient.setQueryData(['pendingNotes'], updatedNotes);
@@ -81,7 +81,7 @@ const AdminNotesList = () => {
       if (directUpdateError) {
         console.warn("Direct update failed, trying RPC function:", directUpdateError);
       } else {
-        console.log("Direct update succeeded:", directUpdateData);
+        // console.log("Direct update succeeded:", directUpdateData);
       }
       
       // Step 3: If direct update failed or to ensure it worked, try the RPC function
@@ -110,7 +110,7 @@ const AdminNotesList = () => {
         if (rawSqlError) {
           console.error("Raw SQL execution failed:", rawSqlError);
         } else {
-          console.log("Raw SQL execution result:", rawSqlData);
+          // console.log("Raw SQL execution result:", rawSqlData);
         }
       }
       
@@ -124,19 +124,19 @@ const AdminNotesList = () => {
       if (verifyError) {
         console.error("Error verifying update:", verifyError);
       } else {
-        console.log("Note after update:", verifyData);
+        // console.log("Note after update:", verifyData);
         
         if (!verifyData.is_approved) {
           console.error("UPDATE FAILED: Note is still not approved in database");
           toast.error("Database update failed. UI will still be updated.");
         } else {
-          console.log("UPDATE CONFIRMED: Note is now approved in database");
+          // console.log("UPDATE CONFIRMED: Note is now approved in database");
         }
       }
       
       // Update UI regardless of database state
       setLocallyApprovedIds(prev => [...prev, id]);
-      console.log("Note approval UI updated successfully");
+      // console.log("Note approval UI updated successfully");
       toast.success("Note approved successfully");
       
       const updatedNotes = pendingNotes?.filter(note => note.id !== id) || [];

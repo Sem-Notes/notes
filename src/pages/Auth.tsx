@@ -12,16 +12,16 @@ const Auth = () => {
 
   // Redirect if user is already logged in
   useEffect(() => {
-    console.log("[AUTH PAGE] Auth page loaded, checking user:", user?.id);
+    // console.log("[AUTH PAGE] Auth page loaded, checking user:", user?.id);
     if (user) {
-      console.log("[AUTH PAGE] User is logged in, redirecting to home");
+      // console.log("[AUTH PAGE] User is logged in, redirecting to home");
       navigate('/home');
     }
   }, [user, navigate]);
 
   const handleGoogleSignIn = async () => {
     try {
-      console.log("[AUTH PAGE] Attempting Google sign in");
+      // console.log("[AUTH PAGE] Attempting Google sign in");
       setLoading(true);
       const { error } = await signInWithGoogle();
       if (error) throw error;

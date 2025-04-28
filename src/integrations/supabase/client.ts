@@ -28,7 +28,7 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
   }
 });
 
-console.log("[SUPABASE] Client initialized with persistSession=true and autoRefreshToken=true");
+// console.log("[SUPABASE] Client initialized with persistSession=true and autoRefreshToken=true");
 
 // Type definitions to prevent circular references
 export type SubjectType = {

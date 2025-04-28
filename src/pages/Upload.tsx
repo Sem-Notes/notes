@@ -58,11 +58,9 @@ const Upload = () => {
     queryKey: ['userProfile', user?.id],
     queryFn: async () => {
       if (!user?.id) {
-        console.log("No user ID available for profile fetch");
         return null;
       }
       
-      console.log("Fetching user profile for ID:", user?.id);
       const { data, error } = await supabase
         .from('students')
         .select('academic_year, semester, branch')
@@ -70,11 +68,9 @@ const Upload = () => {
         .single();
       
       if (error) {
-        console.error("Error fetching user profile:", error);
         throw error;
       }
       
-      console.log("Retrieved user profile:", data);
       return data as StudentProfile;
     },
     enabled: !!user?.id,
@@ -86,12 +82,10 @@ const Upload = () => {
   useEffect(() => {
     try {
       if (userProfile) {
-        console.log("Setting form values from user profile:", userProfile);
         form.setValue('academic_year', userProfile.academic_year || 1);
         form.setValue('semester', userProfile.semester || 1);
       }
     } catch (error) {
-      console.error("Error setting form values from profile:", error);
     }
   }, [userProfile, form]);
 
@@ -114,7 +108,6 @@ const Upload = () => {
   const loadSubjects = async () => {
     try {
       if (!branchName || !academicYear || !semester) {
-        console.log("Missing required data for subject loading");
         return;
       }
       
@@ -128,14 +121,12 @@ const Upload = () => {
         .or(`branch.eq.${branchName},is_common.eq.true`);
       
       if (error) {
-        console.error("Error fetching subjects:", error);
         toast.error("Failed to load subjects. Please try refreshing the page.");
         return;
       }
       
       setSubjects(data || []);
     } catch (err) {
-      console.error("Error loading subjects:", err);
       toast.error("An error occurred while loading subjects");
     } finally {
       setIsSubjectsLoading(false);
@@ -191,7 +182,6 @@ const Upload = () => {
       }
       setCurrentStep(prev => Math.min(prev + 1, 3));
     } catch (error) {
-      console.error("Error navigating steps:", error);
       toast.error("There was a problem proceeding to the next step");
     }
   };
@@ -213,14 +203,11 @@ const Upload = () => {
       }
       
       setUploading(true);
-      console.log("Starting upload process with data:", data);
       
       // Create a folder structure by subject ID for better organization
       const folderPath = `subject_${data.subject_id}`;
       const cleanFileName = file.name.replace(/\s+/g, '_'); // Replace spaces with underscores
       const fileName = `${folderPath}/${user.id}_${Date.now()}_${cleanFileName}`;
-      
-      console.log("Uploading file to storage bucket with path:", fileName);
       
       try {
         const { data: uploadData, error: uploadError } = await supabase.storage
@@ -228,12 +215,9 @@ const Upload = () => {
           .upload(fileName, file);
         
         if (uploadError) {
-          console.error("Error uploading file to storage:", uploadError);
           toast.error(`File upload failed: ${uploadError.message}`);
           return;
         }
-        
-        console.log("File uploaded successfully, getting public URL");
         
         const { data: publicUrlData } = supabase.storage
           .from('notes')
@@ -244,16 +228,6 @@ const Upload = () => {
         }
         
         const fileUrl = publicUrlData.publicUrl;
-        console.log("Public URL:", fileUrl);
-        
-        console.log("Inserting note data into database:", {
-          title: data.title,
-          description: data.description,
-          subject_id: data.subject_id,
-          student_id: user.id,
-          file_url: fileUrl,
-          unit_number: data.unit_number || 1,
-        });
         
         const { error: insertError } = await supabase
           .from('notes')
@@ -270,12 +244,10 @@ const Upload = () => {
           });
         
         if (insertError) {
-          console.error("Error inserting record into database:", insertError);
           toast.error(`Database error: ${insertError.message}`);
           return;
         }
         
-        console.log("Note successfully added to database");
         toast.success("Notes uploaded successfully! It will be available after admin approval.");
         
         // Add a slight delay before navigation to ensure the toast is shown
@@ -284,11 +256,9 @@ const Upload = () => {
         }, 1500);
         
       } catch (error: any) {
-        console.error("Error in upload process:", error);
         toast.error(`Upload failed: ${error.message || "Unknown error occurred"}`);
       }
     } catch (error: any) {
-      console.error("Unexpected error during upload:", error);
       toast.error(`An unexpected error occurred. Please try again.`);
     } finally {
       setUploading(false);
@@ -633,7 +603,6 @@ const Upload = () => {
                       
                       onSubmit(formData);
                     } catch (error) {
-                      console.error("Error submitting form:", error);
                       toast.error("There was a problem submitting your notes");
                     }
                   }}

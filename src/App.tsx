@@ -16,6 +16,7 @@ import NoteView from "./pages/NoteView";
 import PDFView from "./pages/PDFView";
 import OnboardingForm from "./components/OnboardingForm";
 import { AuthProvider } from "./auth/AuthContext";
+import React, { Suspense } from "react";
 
 // Create a client with cache persistence configuration
 const queryClient = new QueryClient({
@@ -31,6 +32,15 @@ const queryClient = new QueryClient({
 
 console.log("[APP] Initializing application with QueryClient");
 
+// Lazy load heavy pages
+const Admin = React.lazy(() => import("./pages/Admin"));
+const Explore = React.lazy(() => import("./pages/Explore"));
+const Profile = React.lazy(() => import("./pages/Profile"));
+const Upload = React.lazy(() => import("./pages/Upload"));
+const PDFView = React.lazy(() => import("./pages/PDFView"));
+const NoteView = React.lazy(() => import("./pages/NoteView"));
+const SubjectDetails = React.lazy(() => import("./pages/SubjectDetails"));
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -38,21 +48,23 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/auth/callback" element={<Auth />} />
-            <Route path="/onboarding" element={<OnboardingForm />} />
-            <Route path="/home" element={<Home />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/upload" element={<Upload />} />
-            <Route path="/admin" element={<Admin />} />
-            <Route path="/explore" element={<Explore />} />
-            <Route path="/subjects/:id" element={<SubjectDetails />} />
-            <Route path="/notes/:id" element={<NoteView />} />
-            <Route path="/page-view/:id" element={<PDFView />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-lg">Loading...</div>}>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/auth/callback" element={<Auth />} />
+              <Route path="/onboarding" element={<OnboardingForm />} />
+              <Route path="/home" element={<Home />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/upload" element={<Upload />} />
+              <Route path="/admin" element={<Admin />} />
+              <Route path="/explore" element={<Explore />} />
+              <Route path="/subjects/:id" element={<SubjectDetails />} />
+              <Route path="/notes/:id" element={<NoteView />} />
+              <Route path="/page-view/:id" element={<PDFView />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>

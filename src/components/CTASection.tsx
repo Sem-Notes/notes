@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from 'react';
 
 const CTASection = () => {
@@ -29,7 +28,7 @@ const CTASection = () => {
   return (
     <section className="py-24 relative overflow-hidden">
       {/* Space background */}
-      <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1462331940025-496dfbfc7564')] bg-cover bg-center opacity-20" />
+      <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1462331940025-496dfbfc7564')] bg-cover bg-center opacity-20 bg-fixed" />
       <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20" />
       
       {/* Stars */}

@@ -10,6 +10,9 @@ export const configurePdfJs = () => {
   return {
     // Disable features that might require external resources
     disableStream: true,
-    disableAutoFetch: true
+    disableAutoFetch: true,
+    // Disable print and download options in the viewer
+    cMapUrl: 'cmaps/',
+    cMapPacked: true
   };
 }; 

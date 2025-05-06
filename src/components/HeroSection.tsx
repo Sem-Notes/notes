@@ -27,25 +27,25 @@ const HeroSection = () => {
         <div className="w-full md:w-1/2 text-center md:text-left md:pl-16">
           <motion.h1 
             ref={titleRef} 
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-bold mb-6 tracking-tight flex items-center justify-center md:justify-start gap-3 whitespace-nowrap overflow-hidden"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-bold mb-6 tracking-tight flex flex-wrap items-center justify-center md:justify-start gap-3"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
             <motion.span 
               className="text-[#8B5CF6] drop-shadow-sm"
-              whileHover={{ scale: 1.05 }}
+              // whileHover={{ scale: 1.05 }}
               transition={{ type: "spring", stiffness: 300 }}
             >
               SemNotes
             </motion.span>
             <TypeAnimation
               sequence={[
-                'Simplify Your Semester',
+                'Smart Study',
                 1000,
-                'Share Your Knowledge',
+                'Study Buddy',
                 1000,
-                'Study Smarter Together',
+                'Share Notes',
                 1000,
               ]}
               wrapper="span"

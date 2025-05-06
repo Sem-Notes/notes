@@ -91,8 +91,7 @@ const PDFView = () => {
       return null;
     }
   };
-  
-  // Function to use file object URL instead of data URL
+
   const handleBlobSuccess = (blob) => {
     setPdfBlob(blob);
     

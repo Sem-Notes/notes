@@ -1,4 +1,6 @@
 import React, { useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 const CTASection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -45,12 +47,24 @@ const CTASection = () => {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="cta-button bg-white text-primary hover:bg-white/90">
-              Get Started Now
-            </button>
+          <Link to="/auth">
+              <motion.button 
+                className="cta-button bg-primary"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Get Started
+              </motion.button>
+            </Link>
+            <motion.a 
+              href="#features"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
             <button className="px-6 py-3 border border-white/20 hover:border-white/40 text-white rounded-full transition-all">
               Learn More
             </button>
+            </motion.a>
           </div>
           
           <div className="mt-12 flex flex-col md:flex-row items-center justify-center gap-8">

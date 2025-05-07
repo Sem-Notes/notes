@@ -41,7 +41,6 @@ const Footer = () => {
             <ul className="space-y-2">
               <FooterLink label="Browse Notes" href="#" />
               <FooterLink label="Upload Notes" href="#" />
-              <FooterLink label="FAQ" href="#" />
               <FooterLink label="Terms of Service" href="#" />
               <FooterLink label="Privacy Policy" href="#" />
             </ul>
@@ -76,7 +75,11 @@ const Footer = () => {
           <p className="text-[#9978e8] text-base flex items-center">
             Built with 
             <span className="text-red-500 mx-1">❤️</span>
-            <span className="text-[#9978e8] text-base">AkshayPatel</span>
+            <span className="text-[#9978e8] text-base">
+            <a href="https://wa.me/917989884992?text=Hello%2C%20I%20found%20you%20via%20your%20SemNotes" target="_blank" rel="noopener noreferrer">
+              AkshayPatel
+              </a>
+              </span>
           </p>
         </div>
       </div>

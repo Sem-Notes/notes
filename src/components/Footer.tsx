@@ -76,10 +76,15 @@ const Footer = () => {
             Built with 
             <span className="text-red-500 mx-1">❤️</span>
             <span className="text-[#9978e8] text-base">
-            <a href="https://wa.me/917989884992?text=Hello%2C%20I%20found%20you%20via%20your%20SemNotes" target="_blank" rel="noopener noreferrer">
-              AkshayPatel
+              <a href="https://wa.me/917989884992?text=Hello%2C%20I%20found%20you%20via%20your%20SemNotes" target="_blank" rel="noopener noreferrer">
+                 AkshayPatel &nbsp;
               </a>
-              </span>
+            </span>
+            <span className="text-[#9978e8] text-base">
+              <a href="https://wa.me/9866856291?text=Hello%2C%20I%20found%20you%20via%20your%20SemNotes" target="_blank" rel="noopener noreferrer">
+                    | &nbsp; AmarNath
+              </a>
+            </span>
           </p>
         </div>
       </div>

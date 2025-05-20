@@ -4,16 +4,18 @@ import Navbar from '@/components/Navbar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Book, Clock, Upload, Search, BookOpen } from 'lucide-react';
+import { Book, Clock, Upload, Search, BookOpen, Edit } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/auth/AuthContext';
 import { CardSkeleton } from '@/components/ui/card-skeleton';
 import { Helmet } from "react-helmet-async";
+import { EditProfileDialog } from '@/components/profile/EditProfileDialog';
 
 const Home = () => {
   const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   // Fetch user's profile
   const { data: userProfile, isLoading: loadingProfile } = useQuery({
@@ -92,7 +94,17 @@ const Home = () => {
         
         <main className="container mx-auto px-4 pt-24 pb-16">
           <div className="mb-6">
-            <h1 className="text-3xl font-bold text-gradient mb-2">Welcome, {userProfile?.full_name || 'Student'}</h1>
+            <div className="flex items-center gap-3">
+              <h1 className="text-3xl font-bold text-gradient mb-2">Welcome, {userProfile?.full_name || 'Student'}</h1>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-muted-foreground hover:text-balance"
+                onClick={() => setIsEditDialogOpen(true)}
+              >
+                <Edit className="h-4 w-4" />
+              </Button>
+            </div>
             <p className="text-muted-foreground">
               {userProfile ? `Viewing notes for Year ${userProfile.academic_year}, Semester ${userProfile.semester}` : 'Loading your profile...'}
             </p>
@@ -218,6 +230,20 @@ const Home = () => {
             )}
           </Tabs>
         </main>
+
+        {/* Edit Profile Dialog */}
+        {userProfile && (
+          <EditProfileDialog
+            isOpen={isEditDialogOpen}
+            onClose={() => setIsEditDialogOpen(false)}
+            initialData={{
+              full_name: userProfile.full_name || '',
+              academic_year: userProfile.academic_year || 1,
+              semester: userProfile.semester || 1,
+              branch: userProfile.branch || 'CSE'
+            }}
+          />
+        )}
       </div>
     </>
   );

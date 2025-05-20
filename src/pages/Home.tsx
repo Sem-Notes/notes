@@ -169,7 +169,7 @@ const Home = () => {
                           </p>
                         </CardContent>
                         <CardFooter className="flex justify-between text-sm text-muted-foreground border-t border-white/5 pt-4">
-                          <Button variant="outline" size="sm" className="group-hover:border-primary/50 group-hover:text-primary">
+                          <Button variant="outline" size="sm" className="group-hover:border-primary/50 group-hover:text-balance">
                             View Notes
                           </Button>
                         </CardFooter>

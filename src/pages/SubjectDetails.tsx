@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import Navbar from '@/components/Navbar';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { BookOpen, Download, Star, Calendar, Eye, FileText, ArrowLeft } from 'lucide-react';
+import { BookOpen, Calendar, Eye, FileText, ArrowLeft } from 'lucide-react';
 import { CardSkeleton } from '@/components/ui/card-skeleton';
 import { Helmet } from "react-helmet-async";
 
@@ -148,16 +148,8 @@ const SubjectDetails = () => {
                         </span>
                         <div className="flex items-center gap-3 text-sm">
                           <div className="flex items-center">
-                            <Star className="h-4 w-4 text-amber-400 mr-1" />
-                            <span>{note.average_rating ? note.average_rating.toFixed(1) : '0.0'}</span>
-                          </div>
-                          <div className="flex items-center">
                             <Eye className="h-4 w-4 text-blue-400 mr-1" />
                             <span>{note.views || 0}</span>
-                          </div>
-                          <div className="flex items-center">
-                            <Download className="h-4 w-4 text-green-400 mr-1" />
-                            <span>{note.downloads || 0}</span>
                           </div>
                         </div>
                       </div>

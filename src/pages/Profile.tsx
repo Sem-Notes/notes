@@ -8,7 +8,7 @@ import { useAuth } from '@/auth/AuthContext';
 import { Link } from 'react-router-dom';
 import { EditProfileDialog } from '@/components/profile/EditProfileDialog';
 import { CardSkeleton } from '@/components/ui/card-skeleton';
-import { Edit, Upload, BookOpen, Star, Clock, Medal, Settings, Camera } from 'lucide-react';
+import { Edit, Upload, Clock, Medal, Settings, Camera } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { Helmet } from "react-helmet-async";
@@ -86,31 +86,6 @@ const Profile = () => {
         .eq('user_id', user?.id)
         .order('viewed_at', { ascending: false })
         .limit(5);
-      
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!user
-  });
-
-  // Fetch user's bookmarks
-  const { data: bookmarks } = useQuery({
-    queryKey: ['userBookmarks', user?.id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('bookmarks')
-        .select(`
-          *,
-          note:notes(
-            id, 
-            title, 
-            student_id,
-            subject_id,
-            subject:subjects(name, branch, academic_year, semester)
-          )
-        `)
-        .eq('user_id', user?.id)
-        .order('created_at', { ascending: false });
       
       if (error) throw error;
       return data;
@@ -236,7 +211,7 @@ const Profile = () => {
                           )}
                           {averageRating >= 4.5 && (
                             <div className="bg-primary/20 p-2 rounded-md flex items-center">
-                              <Star className="h-4 w-4 mr-1 text-primary" />
+                              <Medal className="h-4 w-4 mr-1 text-primary" />
                               <span className="text-xs">Top Rated</span>
                             </div>
                           )}
@@ -257,9 +232,6 @@ const Profile = () => {
                   <TabsTrigger value="history" className="flex-1 data-[state=active]:bg-primary/30">
                     <Clock className="h-4 w-4 mr-2" /> History
                   </TabsTrigger>
-                  <TabsTrigger value="bookmarks" className="flex-1 data-[state=active]:bg-primary/30">
-                    <BookOpen className="h-4 w-4 mr-2" /> Bookmarks
-                  </TabsTrigger>
                 </TabsList>
                 
                 <TabsContent value="uploads" className="mt-6">
@@ -271,7 +243,6 @@ const Profile = () => {
                             <CardTitle className="flex justify-between text-base font-medium">
                               <span>{note.title}</span>
                               <div className="flex items-center text-amber-400">
-                                <Star className="h-4 w-4 fill-current" />
                                 <span className="ml-1 text-sm">{note.average_rating?.toFixed(1) || '0.0'}</span>
                               </div>
                             </CardTitle>
@@ -324,30 +295,6 @@ const Profile = () => {
                   ) : (
                     <div className="text-center py-8 text-muted-foreground">
                       Your history will appear here when you view notes.
-                    </div>
-                  )}
-                </TabsContent>
-                
-                <TabsContent value="bookmarks" className="mt-6">
-                  {bookmarks && bookmarks.length > 0 ? (
-                    <div className="space-y-4">
-                      {bookmarks.map((bookmark) => (
-                        <Card key={bookmark.id} className="border border-white/10 bg-black/40">
-                          <CardHeader className="p-4">
-                            <CardTitle className="flex justify-between text-base font-medium">
-                              <span>{bookmark.note?.title}</span>
-                            </CardTitle>
-                            <div className="flex justify-between text-xs text-muted-foreground">
-                              <div>{bookmark.note?.subject?.name} • Year {bookmark.note?.subject?.academic_year}, Semester {bookmark.note?.subject?.semester}</div>
-                              <div>Bookmarked {new Date(bookmark.created_at).toLocaleDateString()}</div>
-                            </div>
-                          </CardHeader>
-                        </Card>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-8 text-muted-foreground">
-                      You haven't bookmarked any notes yet.
                     </div>
                   )}
                 </TabsContent>

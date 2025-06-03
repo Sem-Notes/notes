@@ -104,9 +104,7 @@ const Profile = () => {
   // Calculate statistics
   const uploadsCount = uploads?.length || 0;
   const viewsCount = uploads?.reduce((sum, note) => sum + (note.views || 0), 0) || 0;
-  const averageRating = uploads?.length
-    ? uploads.reduce((sum, note) => sum + (note.average_rating || 0), 0) / uploads.length
-    : 0;
+  const approvedCount = uploads?.filter(note => note.is_approved).length || 0;
 
   const initials = profile?.full_name
     ? profile.full_name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)
@@ -185,8 +183,8 @@ const Profile = () => {
                           <div className="text-xs text-muted-foreground">Views</div>
                         </div>
                         <div className="bg-black/30 p-3 rounded-md">
-                          <div className="text-xl font-bold">{averageRating.toFixed(1)}</div>
-                          <div className="text-xs text-muted-foreground">Avg. Rating</div>
+                          <div className="text-xl font-bold">{approvedCount}</div>
+                          <div className="text-xs text-muted-foreground">Approved</div>
                         </div>
                       </div>
                       
@@ -209,10 +207,10 @@ const Profile = () => {
                               <span className="text-xs">Contributor</span>
                             </div>
                           )}
-                          {averageRating >= 4.5 && (
+                          {approvedCount > 2 && (
                             <div className="bg-primary/20 p-2 rounded-md flex items-center">
                               <Medal className="h-4 w-4 mr-1 text-primary" />
-                              <span className="text-xs">Top Rated</span>
+                              <span className="text-xs">Top Contributor</span>
                             </div>
                           )}
                         </div>
@@ -242,8 +240,12 @@ const Profile = () => {
                           <CardHeader className="p-4">
                             <CardTitle className="flex justify-between text-base font-medium">
                               <span>{note.title}</span>
-                              <div className="flex items-center text-amber-400">
-                                <span className="ml-1 text-sm">{note.average_rating?.toFixed(1) || '0.0'}</span>
+                              <div className="flex items-center">
+                                {note.is_approved ? (
+                                  <span className="text-green-500 text-lg">✅</span>
+                                ) : (
+                                  <span className="text-red-500 text-lg">❌</span>
+                                )}
                               </div>
                             </CardTitle>
                             <div className="flex justify-between text-xs text-muted-foreground">

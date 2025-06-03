@@ -262,7 +262,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}`
+        redirectTo: `${window.location.origin}/auth/v1/callback`
       }
     });
     if (error) console.error("[AUTH] Google sign in error:", error);

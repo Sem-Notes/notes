@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { BookOpen, Home, Upload as UploadIcon, User, Menu, X, LogOut } from 'lucide-react';
+import { BookOpen, Home, Upload as UploadIcon, User, Menu, X, LogOut, Sparkles } from 'lucide-react';
 import { useAuth } from '@/auth/AuthContext';
 import UserAvatar from '@/components/UserAvatar';
 import {
@@ -11,6 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { cn } from '@/lib/utils';
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -56,6 +57,13 @@ const Navbar = () => {
               <NavLink to="/home" label="Home" icon={<Home className="h-4 w-4" />} />
               <NavLink to="/explore" label="Explore" icon={<BookOpen className="h-4 w-4" />} />
               <NavLink to="/upload" label="Upload" icon={<UploadIcon className="h-4 w-4" />} />
+              <NavLink 
+                to="/nyra" 
+                label="Nyra" 
+                icon={<Sparkles className="h-4 w-4" />} 
+                isFeatured={true}
+                isGlowing={true}
+              />
               <NavLink to="/profile" label="Profile" icon={<User className="h-4 w-4" />} />
             </>
           )}
@@ -182,6 +190,9 @@ const Navbar = () => {
                 <Link to="/upload" className="py-2 flex items-center gap-2" onClick={toggleMobileMenu}>
                   <UploadIcon className="h-5 w-5" /> Upload
                 </Link>
+                <Link to="/nyra" className="py-2 flex items-center gap-2" onClick={toggleMobileMenu}>
+                  <Sparkles className="h-5 w-5" /> Nyra
+                </Link>
                 <Link to="/profile" className="py-2 flex items-center gap-2" onClick={toggleMobileMenu}>
                   <User className="h-5 w-5" /> Profile
                 </Link>
@@ -205,25 +216,50 @@ const Navbar = () => {
   );
 };
 
+interface NavLinkProps {
+  to?: string;
+  href?: string;
+  label: string;
+  icon?: React.ReactNode;
+  isNew?: boolean;
+  isFeatured?: boolean;
+  isGlowing?: boolean;
+}
+
 const NavLink = ({ 
   to, 
   href, 
   label, 
-  icon 
-}: { 
-  to?: string; 
-  href?: string; 
-  label: string; 
-  icon?: React.ReactNode;
-}) => {
+  icon,
+  isNew,
+  isFeatured,
+  isGlowing
+}: NavLinkProps) => {
   if (to) {
     return (
       <Link 
         to={to} 
-        className="text-gray-300 hover:text-white transition-colors flex items-center gap-2"
+        className={cn(
+          "text-gray-300 hover:text-white transition-colors flex items-center gap-2 relative group",
+          isFeatured && "text-primary hover:text-primary/90"
+        )}
       >
-        {icon}
+        {icon && (
+          <span className={cn(
+            (label === "Nyra" || isGlowing) && "animate-pulse drop-shadow-md"
+          )}>
+            {icon}
+          </span>
+        )}
         {label}
+        {isNew && (
+          <div className="absolute -top-1 -right-1 flex items-center gap-1">
+            <span className="px-1.5 py-0.5 text-[10px] font-medium bg-primary/10 text-primary rounded-full border border-primary/20">
+              New
+            </span>
+            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+          </div>
+        )}
       </Link>
     );
   }

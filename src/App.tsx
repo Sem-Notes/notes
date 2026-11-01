@@ -18,6 +18,7 @@ const Upload = React.lazy(() => import("./pages/Upload"));
 const PDFView = React.lazy(() => import("./pages/PDFView"));
 const NoteView = React.lazy(() => import("./pages/NoteView"));
 const SubjectDetails = React.lazy(() => import("./pages/SubjectDetails"));
+const Nyra = React.lazy(() => import("./pages/Nyra"));
 
 // Create a client with cache persistence configuration
 const queryClient = new QueryClient({
@@ -82,6 +83,7 @@ const App = () => (
                 <Route path="/subjects/:id" element={<SubjectDetails />} />
                 <Route path="/notes/:id" element={<NoteView />} />
                 <Route path="/page-view/:id" element={<PDFView />} />
+                <Route path="/nyra" element={<Nyra />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>

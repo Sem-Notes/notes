@@ -297,6 +297,41 @@ export type Database = {
           },
         ]
       }
+      nyra_chats: {
+        Row: {
+          id: string;
+          user_id: string;
+          question: string;
+          response: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          question: string;
+          response: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          question?: string;
+          response?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "nyra_chats_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "students";
+            referencedColumns: ["id"];
+          }
+        ];
+      },
     }
     Views: {
       [_ in never]: never

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { BookOpen, Home, Upload as UploadIcon, User, Menu, X, LogOut } from 'lucide-react';
+import { BookOpen, Home, Upload as UploadIcon, User, Menu, X, LogOut, Sparkles } from 'lucide-react';
 import { useAuth } from '@/auth/AuthContext';
 import UserAvatar from '@/components/UserAvatar';
 import {
@@ -55,6 +55,7 @@ const Navbar = () => {
             <>
               <NavLink to="/home" label="Home" icon={<Home className="h-4 w-4" />} />
               <NavLink to="/explore" label="Explore" icon={<BookOpen className="h-4 w-4" />} />
+              <NavLink to="/nyra" label={<span className="flex items-center gap-1 text-purple-400 font-semibold animate-blink"><Sparkles className="w-5 h-5" /> <span className="text-purple-400">Nyra</span></span>} />
               <NavLink to="/upload" label="Upload" icon={<UploadIcon className="h-4 w-4" />} />
               <NavLink to="/profile" label="Profile" icon={<User className="h-4 w-4" />} />
             </>
@@ -179,6 +180,9 @@ const Navbar = () => {
                 <Link to="/explore" className="py-2 flex items-center gap-2" onClick={toggleMobileMenu}>
                   <BookOpen className="h-5 w-5" /> Explore
                 </Link>
+                <Link to="/nyra" className="py-2 flex items-center gap-2 font-semibold text-purple-400 animate-blink" onClick={toggleMobileMenu}>
+                  <Sparkles className="w-5 h-5" /> <span className="text-purple-400">Nyra</span>
+                </Link>
                 <Link to="/upload" className="py-2 flex items-center gap-2" onClick={toggleMobileMenu}>
                   <UploadIcon className="h-5 w-5" /> Upload
                 </Link>
@@ -239,3 +243,13 @@ const NavLink = ({
 };
 
 export default Navbar;
+
+<style jsx global>{`
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+.animate-blink {
+  animation: blink 1.2s infinite;
+}
+`}</style>
